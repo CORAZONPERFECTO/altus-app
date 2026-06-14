@@ -147,7 +147,7 @@ export default function EliteLandingPage() {
             </div>
           </div>
 
-          {/* Card 5: AI Studio */}
+          {/* Card 5: AI Especialista */}
           <div className="md:col-span-2 glass-panel border border-white/5 rounded-3xl p-8 hover:border-white/10 transition-colors relative overflow-hidden group">
              <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
               <Sparkles size={100} />
@@ -156,8 +156,8 @@ export default function EliteLandingPage() {
               <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10 mb-6">
                 <Sparkles size={24} className="text-blue-400" />
               </div>
-              <h3 className="text-2xl font-bold text-white mb-2">AI Studio & RAG</h3>
-              <p className="text-zinc-400 font-medium max-w-md">No uses ChatGPT genérico. Altus inyecta el contexto de tu marca en un LLM privado para generar copys que sí suenan a ti.</p>
+              <h3 className="text-2xl font-bold text-white mb-2">IA Especialista (Propiedad Intelectual)</h3>
+              <p className="text-zinc-400 font-medium max-w-md leading-relaxed">Hemos entrenado a nuestra IA como un Especialista de élite utilizando una combinación de estrategias basadas en investigaciones y datos cerrados. <span className="block mt-2 text-xs text-zinc-500 uppercase tracking-widest font-bold">*Módulo protegido por derechos reservados.</span></p>
             </div>
           </div>
         </div>

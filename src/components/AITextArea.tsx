@@ -17,8 +17,7 @@ export default function AITextArea({ value, onChange, placeholder, className, co
   // Inicializar Web Speech API para el dictado
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      // @ts-ignore
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
       if (SpeechRecognition) {
         const rec = new SpeechRecognition();
         rec.continuous = true;
