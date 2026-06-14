@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Settings, LogOut, Home, Users, BarChart3, Menu, Sparkles, PenSquare, ShoppingBag, Radar, BrainCircuit, HeadphonesIcon, ShieldAlert, Wallet } from 'lucide-react';
+import { Settings, LogOut, Home, Users, BarChart3, Menu, Sparkles, PenSquare, ShoppingBag, Radar, BrainCircuit, HeadphonesIcon, ShieldAlert, Wallet, Map } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useTenant } from '@/hooks/useTenant';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -51,7 +51,8 @@ export default function DashboardLayout({
             <NavItem href="/dashboard" icon={<Home size={18} strokeWidth={2.5} />} label="Inicio" currentPath={pathname} />
             <NavItem href="/dashboard/cuentas" icon={<Users size={18} strokeWidth={2.5} />} label="Redes Sociales" currentPath={pathname} />
             <NavItem href="/dashboard/analizador" icon={<Sparkles size={18} strokeWidth={2.5} />} label="AI Studio" currentPath={pathname} />
-            <NavItem href="/dashboard/estrategia" icon={<BrainCircuit size={18} strokeWidth={2.5} />} label="Metas y Estrategia" currentPath={pathname} />
+            <NavItem href="/dashboard/estrategia" icon={<BrainCircuit size={18} strokeWidth={2.5} />} label="Estrategia AI" currentPath={pathname} />
+            <NavItem href="/dashboard/pizarra" icon={<Map size={18} strokeWidth={2.5} />} label="Pizarra de Claridad" currentPath={pathname} />
             <NavItem href="/dashboard/publicador" icon={<PenSquare size={18} strokeWidth={2.5} />} label="Publicar" currentPath={pathname} />
             <NavItem href="/dashboard/billetera" icon={<Wallet size={18} strokeWidth={2.5} />} label="Mi Billetera" currentPath={pathname} />
             <NavItem href="/dashboard/reportes" icon={<BarChart3 size={18} strokeWidth={2.5} />} label="Analíticas" currentPath={pathname} />
