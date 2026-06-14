@@ -42,7 +42,7 @@ export default function PublisherPage() {
     setLoadingPosts(true);
     try {
       const dbPosts = await getPostsByTenant(tenant.id);
-      setPosts(dbPosts as Post[]);
+      setPosts(dbPosts as unknown as Post[]);
     } catch (error) {
       console.error(error);
     } finally {
