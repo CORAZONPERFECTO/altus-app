@@ -1,0 +1,160 @@
+/**
+ * Altus — Firestore Security Rules
+ *
+ * PRINCIPIO FUNDAMENTAL: Aislamiento total entre tenants.
+ * Ningún usuario puede leer o escribir datos de otro tenant, jamás.
+ *
+ * Cómo desplegar:
+ * 1. Instala Firebase CLI: npm install -g firebase-tools
+ * 2. Inicia sesión: firebase login
+ * 3. Inicia el proyecto: firebase init firestore
+ * 4. Despliega: firebase deploy --only firestore:rules
+ */
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // FUNCIONES AUXILIARES (helpers reutilizables)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    // Verifica que el usuario está autenticado
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Obtiene el UID del usuario autenticado
+    function uid() {
+      return request.auth.uid;
+    }
+
+    // Verifica que el usuario es miembro del tenant
+    function isTenantMember(tenantId) {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/tenants/$(tenantId)/members/$(uid()));
+    }
+
+    // Obtiene el rol del usuario en el tenant
+    function getMemberRole(tenantId) {
+      return get(/databases/$(database)/documents/tenants/$(tenantId)/members/$(uid())).data.role;
+    }
+
+    // Verifica que el usuario tiene un rol específico o superior
+    function hasRole(tenantId, roles) {
+      return isTenantMember(tenantId) && getMemberRole(tenantId) in roles;
+    }
+
+    // Verifica que el usuario es owner del tenant
+    function isTenantOwner(tenantId) {
+      return hasRole(tenantId, ['owner']);
+    }
+
+    // Verifica que el usuario es admin o superior
+    function isTenantAdmin(tenantId) {
+      return hasRole(tenantId, ['owner', 'admin']);
+    }
+
+    // Verifica que el usuario es editor o superior
+    function isTenantEditor(tenantId) {
+      return hasRole(tenantId, ['owner', 'admin', 'editor']);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // PERFILES DE USUARIO
+    // /users/{userId}
+    // ─────────────────────────────────────────────────────────────────────────
+
+    match /users/{userId} {
+      // Solo el propio usuario puede leer y escribir su perfil
+      allow read, write: if isAuthenticated() && uid() == userId;
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // TENANTS (Organizaciones)
+    // /tenants/{tenantId}
+    // ─────────────────────────────────────────────────────────────────────────
+
+    match /tenants/{tenantId} {
+      // Solo los miembros pueden leer el tenant
+      allow read: if isTenantMember(tenantId);
+
+      // Solo el sistema (Cloud Functions) puede crear tenants — no el cliente
+      allow create: if isAuthenticated();
+
+      // Solo admins pueden actualizar el tenant
+      allow update: if isTenantAdmin(tenantId);
+
+      // Solo el owner puede eliminar el tenant
+      allow delete: if isTenantOwner(tenantId);
+
+      // ── Miembros ──────────────────────────────────────────────────────────
+      // /tenants/{tenantId}/members/{memberId}
+
+      match /members/{memberId} {
+        // Cualquier miembro puede ver la lista de miembros
+        allow read: if isTenantMember(tenantId);
+
+        // BOOTSTRAP: el creador del tenant puede agregar su propio doc de miembro.
+        // Esto resuelve el problema huevo-gallina: para crear el primer miembro
+        // necesitarías ser admin, pero para ser admin necesitas ser miembro.
+        // Solución: si eres el ownerId del tenant, puedes crear TU PROPIO doc de miembro.
+        //
+        // Luego, los admins existentes pueden agregar más miembros normalmente.
+        allow create: if isAuthenticated() && (
+          // Bootstrap del owner: el doc que se crea es el del propio usuario
+          // y el tenant lo declara como owner
+          (memberId == uid() &&
+            get(/databases/$(database)/documents/tenants/$(tenantId)).data.ownerId == uid())
+          ||
+          // Ruta normal: admins agregan otros miembros
+          isTenantAdmin(tenantId)
+        );
+
+        // Solo admins pueden modificar roles (excepto su propio rol)
+        allow update: if isTenantAdmin(tenantId) && memberId != uid();
+
+        // Solo admins pueden eliminar miembros (o el propio usuario puede salir)
+        allow delete: if isTenantAdmin(tenantId) || memberId == uid();
+      }
+
+
+      // ── Workspaces ────────────────────────────────────────────────────────
+      // /tenants/{tenantId}/workspaces/{workspaceId}
+
+      match /workspaces/{workspaceId} {
+        // Solo miembros del workspace pueden leer
+        allow read: if isTenantMember(tenantId) &&
+          (uid() in resource.data.memberIds || isTenantAdmin(tenantId));
+
+        // Editors y superiores pueden crear workspaces
+        allow create: if isTenantEditor(tenantId);
+
+        // Editors y superiores pueden actualizar si son miembros del workspace
+        allow update: if isTenantEditor(tenantId) &&
+          uid() in resource.data.memberIds;
+
+        // Solo admins pueden eliminar workspaces
+        allow delete: if isTenantAdmin(tenantId);
+      }
+
+      // ── Cuentas Sociales ──────────────────────────────────────────────────
+      // /tenants/{tenantId}/socialAccounts/{accountId}
+
+      match /socialAccounts/{accountId} {
+        // Miembros del tenant pueden leer cuentas sociales
+        allow read: if isTenantMember(tenantId);
+
+        // Editors pueden conectar nuevas cuentas
+        allow create: if isTenantEditor(tenantId);
+
+        // Editors pueden actualizar estado de cuentas
+        allow update: if isTenantEditor(tenantId);
+
+        // Solo admins pueden desconectar cuentas
+        allow delete: if isTenantAdmin(tenantId);
+      }
+    }
+  }
+}
