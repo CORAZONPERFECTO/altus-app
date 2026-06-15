@@ -5,7 +5,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
 }
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder', {
-  apiVersion: '2023-10-16', // Usamos una versión estable y reciente
+  apiVersion: '2026-05-27.dahlia', // Versión requerida por el SDK actual
   typescript: true,
   appInfo: {
     name: 'Altus SaaS',
