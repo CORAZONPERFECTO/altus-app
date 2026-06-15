@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
-  signInWithRedirect,
+  signInWithPopup,
   signInWithEmailAndPassword,
   GoogleAuthProvider,
   createUserWithEmailAndPassword,
@@ -37,8 +37,8 @@ export default function LoginPage() {
     setError('');
     setIsSubmitting(true);
     try {
-      await signInWithRedirect(auth, googleProvider);
-      // La página se recargará automáticamente. El hook onAuthStateChanged hará el push al dashboard.
+      await signInWithPopup(auth, googleProvider);
+      router.push('/dashboard');
     } catch (err: unknown) {
       setError(getFirebaseErrorMessage(err));
       setIsSubmitting(false);
