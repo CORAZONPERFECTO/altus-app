@@ -84,6 +84,10 @@ export default function EliteLandingPage() {
               <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
+          
+          <p className="mt-6 text-[11px] md:text-xs text-zinc-500 font-medium max-w-xl mx-auto animate-fade-up px-4" style={{ animationDelay: '350ms' }}>
+            * <strong>Hack de rentabilidad:</strong> Utiliza el Radar de Tendencias de Altus para capturar olas virales y monetizarlas con enlaces de afiliados (Amazon, etc). Una estrategia diseñada para que tu membresía se autosustente mes a mes.
+          </p>
         </div>
 
         {/* Bento Grid */}
