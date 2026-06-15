@@ -127,6 +127,47 @@ export default function BilleteraPage() {
 
       </div>
 
+      {/* Estrategia de Autosustentabilidad (Para Monetizadores) */}
+      <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-blue-500/20 bg-gradient-to-br from-blue-900/10 to-indigo-900/10 mb-8 relative overflow-hidden group">
+        <div className="absolute top-0 right-0 p-8 opacity-5 transition-transform group-hover:scale-110">
+          <TrendingUp size={120} />
+        </div>
+        <div className="relative z-10">
+          <div className="flex items-center space-x-2 mb-3">
+            <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center border border-blue-500/30">
+              <Zap size={16} className="text-blue-400" />
+            </div>
+            <h3 className="text-white font-bold text-lg tracking-tight">Estrategia de Autosustentabilidad</h3>
+            <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest ml-2">
+              ROI Positivo
+            </span>
+          </div>
+          
+          <p className="text-sm text-zinc-300 font-medium leading-relaxed mb-4 max-w-3xl">
+            Si eres un creador que monetiza, la suscripción mensual de Altus está diseñada para pagarse sola.
+          </p>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+            <div className="bg-black/40 border border-white/5 rounded-xl p-4">
+              <p className="text-zinc-500 text-xs font-bold uppercase tracking-wider mb-1">Costo Mensual</p>
+              <p className="text-xl font-black text-white">$29<span className="text-sm text-zinc-500">/mes</span></p>
+            </div>
+            <div className="bg-black/40 border border-white/5 rounded-xl p-4">
+              <p className="text-zinc-500 text-xs font-bold uppercase tracking-wider mb-1">1 Video Viral Extra</p>
+              <p className="text-xl font-black text-emerald-400">~$150<span className="text-sm text-emerald-500/50"> USD</span></p>
+            </div>
+            <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4">
+              <p className="text-emerald-500/70 text-xs font-bold uppercase tracking-wider mb-1">Ganancia Neta</p>
+              <p className="text-xl font-black text-emerald-400">+$121<span className="text-sm text-emerald-500/50"> USD</span></p>
+            </div>
+          </div>
+          
+          <p className="text-[11px] text-zinc-500 italic max-w-3xl">
+            <strong className="text-zinc-400 font-semibold">El principio del apalancamiento:</strong> Utilizar nuestras herramientas de IA para optimizar un guion, mejorar un título o publicar en el momento exacto puede generar 1 o 2 videos virales adicionales al mes. Los ingresos generados por Adsense (YouTube/TikTok) o afiliados en un solo video exitoso cubren múltiples meses de suscripción. Estratégicamente, Altus pasa de ser un gasto a ser un activo que multiplica tu tiempo y dinero.
+          </p>
+        </div>
+      </div>
+
       {/* Historial de Transacciones */}
       <div className="glass-panel rounded-3xl border border-white/5 overflow-hidden">
         <div className="p-6 border-b border-white/5 flex items-center space-x-2">
