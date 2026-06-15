@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Settings, LogOut, Home, Users, BarChart3, Menu, Sparkles, PenSquare, ShoppingBag, Radar, BrainCircuit, HeadphonesIcon, ShieldAlert, Wallet, Map } from 'lucide-react';
+import { Settings, LogOut, Home, Users, BarChart3, Menu, Sparkles, PenSquare, ShoppingBag, Radar, BrainCircuit, HeadphonesIcon, ShieldAlert, Wallet, Map, Share2 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useTenant } from '@/hooks/useTenant';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -49,7 +49,8 @@ export default function DashboardLayout({
           <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
             <p className="px-4 text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-4">Menu Principal</p>
             <NavItem href="/dashboard" icon={<Home size={18} strokeWidth={2.5} />} label="Inicio" currentPath={pathname} />
-            <NavItem href="/dashboard/cuentas" icon={<Users size={18} strokeWidth={2.5} />} label="Redes Sociales" currentPath={pathname} />
+            <NavItem href="/dashboard/equipo" icon={<Users size={18} strokeWidth={2.5} />} label="Mi Equipo" currentPath={pathname} />
+            <NavItem href="/dashboard/cuentas" icon={<Share2 size={18} strokeWidth={2.5} />} label="Redes Sociales" currentPath={pathname} />
             <NavItem href="/dashboard/analizador" icon={<Sparkles size={18} strokeWidth={2.5} />} label="AI Studio" currentPath={pathname} />
             <NavItem href="/dashboard/estrategia" icon={<BrainCircuit size={18} strokeWidth={2.5} />} label="Estrategia AI" currentPath={pathname} />
             <NavItem href="/dashboard/pizarra" icon={<Map size={18} strokeWidth={2.5} />} label="Pizarra de Claridad" currentPath={pathname} />

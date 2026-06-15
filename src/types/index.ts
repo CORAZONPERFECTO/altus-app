@@ -62,6 +62,21 @@ export interface TenantMember {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// INVITATION (Invitación a un Workspace)
+// Colección Firestore: /tenants/{tenantId}/invitations/{invitationId}
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface Invitation {
+  id: string;
+  tenantId: string;
+  email: string;
+  role: MemberRole;
+  token: string;
+  status: 'pending' | 'accepted';
+  createdAt: Timestamp;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // USER PROFILE (Perfil propio del usuario)
 // Colección Firestore: /users/{userId}
 // ─────────────────────────────────────────────────────────────────────────────

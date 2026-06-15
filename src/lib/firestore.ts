@@ -130,6 +130,80 @@ export async function isTenantSlugTaken(slug: string): Promise<boolean> {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// INVITATIONS & MEMBERS
+// ─────────────────────────────────────────────────────────────────────────────
+
+export async function getTenantMembers(tenantId: string): Promise<TenantMember[]> {
+  const q = query(collection(db, 'tenants', tenantId, 'members'));
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => d.data() as TenantMember);
+}
+
+export async function createInvitation(
+  tenantId: string,
+  email: string,
+  role: 'owner' | 'admin' | 'editor' | 'viewer'
+): Promise<string> {
+  const ref = doc(collection(db, 'tenants', tenantId, 'invitations'));
+  const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+  
+  await setDoc(ref, {
+    id: ref.id,
+    tenantId,
+    email,
+    role,
+    token,
+    status: 'pending',
+    createdAt: serverTimestamp(),
+  });
+  
+  return token;
+}
+
+export async function getPendingInvitations(tenantId: string) {
+  const q = query(
+    collection(db, 'tenants', tenantId, 'invitations'),
+    where('status', '==', 'pending')
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => d.data());
+}
+
+export async function getInvitationByToken(tenantId: string, token: string) {
+  const q = query(
+    collection(db, 'tenants', tenantId, 'invitations'),
+    where('token', '==', token),
+    where('status', '==', 'pending')
+  );
+  const snap = await getDocs(q);
+  if (snap.empty) return null;
+  return snap.docs[0].data();
+}
+
+export async function acceptInvitation(
+  tenantId: string,
+  invitationId: string,
+  userId: string,
+  userEmail: string,
+  userName: string,
+  role: string
+) {
+  const invRef = doc(db, 'tenants', tenantId, 'invitations', invitationId);
+  await updateDoc(invRef, { status: 'accepted' });
+
+  const memberRef = doc(db, 'tenants', tenantId, 'members', userId);
+  await setDoc(memberRef, {
+    userId,
+    email: userEmail,
+    displayName: userName,
+    role,
+    joinedAt: serverTimestamp(),
+  });
+
+  await setUserTenant(userId, tenantId);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // WORKSPACES
 // ─────────────────────────────────────────────────────────────────────────────
 
