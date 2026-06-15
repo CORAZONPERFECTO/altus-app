@@ -127,7 +127,7 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="tu@empresa.com"
                 required
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#1A56DB]/30 focus:border-[#1A56DB] outline-none transition-all text-sm"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#1A56DB]/30 focus:border-[#1A56DB] outline-none transition-all text-sm text-gray-900 placeholder-gray-400"
               />
             </div>
             <div>
@@ -141,7 +141,7 @@ export default function LoginPage() {
                 placeholder="••••••••"
                 required
                 minLength={6}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#1A56DB]/30 focus:border-[#1A56DB] outline-none transition-all text-sm"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#1A56DB]/30 focus:border-[#1A56DB] outline-none transition-all text-sm text-gray-900 placeholder-gray-400"
               />
             </div>
 
