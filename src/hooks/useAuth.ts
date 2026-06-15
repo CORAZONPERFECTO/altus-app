@@ -1,6 +1,6 @@
 // hooks/useAuth.ts
 import { useState, useEffect } from 'react';
-import { User, onAuthStateChanged, signOut as firebaseSignOut, GoogleAuthProvider, signInWithRedirect } from 'firebase/auth';
+import { User, onAuthStateChanged, signOut as firebaseSignOut, GoogleAuthProvider, signInWithRedirect, getRedirectResult } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 
 export function useAuth() {
@@ -8,12 +8,31 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+    let timeout: NodeJS.Timeout;
+    
+    // 1. Process redirect result if any
+    getRedirectResult(auth).catch((error) => {
+      console.error('Error resolving Google Auth redirect:', error);
       setLoading(false);
     });
 
-    return () => unsubscribe();
+    // 2. Listen to auth state
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setLoading(false);
+      clearTimeout(timeout);
+    });
+
+    // 3. Fallback timeout (if Firebase gets stuck forever)
+    timeout = setTimeout(() => {
+      console.warn('Auth state loading timed out. Forcing UI to load.');
+      setLoading(false);
+    }, 5000);
+
+    return () => {
+      unsubscribe();
+      clearTimeout(timeout);
+    };
   }, []);
 
   const signInWithGoogle = async () => {
