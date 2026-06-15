@@ -54,7 +54,7 @@ export default function CuentasPage() {
       if (oauthPayload && tenant?.id) {
         try {
           const payload = JSON.parse(decodeURIComponent(atob(oauthPayload)));
-          const accountId = `yt-${payload.channelId || Date.now()}`;
+          const accountId = payload.channelId || `${payload.platform}-${Date.now()}`;
           
           await saveSocialAccount(tenant.id, accountId, {
             id: accountId,
@@ -110,10 +110,28 @@ export default function CuentasPage() {
       return;
     }
 
-    setTimeout(() => {
-      setConnecting(null);
-      alert(`La integración con ${PLATFORM_CONFIGS[platform].name} estará disponible pronto.`);
-    }, 1500);
+    // Flujo Mock para las otras plataformas
+    const stateParam = btoa(JSON.stringify({ 
+      tenantId: tenant.id, 
+      userId: user.uid,
+      platform 
+    }));
+
+    let mockAuthUrl = '';
+    
+    if (platform === 'tiktok') {
+      mockAuthUrl = `/api/oauth/tiktok/callback?code=mock-code&state=${stateParam}`;
+    } else if (platform === 'instagram' || platform === 'facebook') {
+      mockAuthUrl = `/api/oauth/facebook/callback?code=mock-code&state=${stateParam}`;
+    } else if (platform === 'linkedin') {
+      mockAuthUrl = `/api/oauth/linkedin/callback?code=mock-code&state=${stateParam}`;
+    }
+
+    if (mockAuthUrl) {
+      setTimeout(() => {
+        window.location.href = mockAuthUrl;
+      }, 600); // Pequeño delay visual para que se vea el spinner
+    }
   };
 
   const activePlatforms = new Set(accounts.map(a => a.platform));
