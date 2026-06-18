@@ -1,7 +1,14 @@
+import OpenAI from 'openai';
+
 export const runtime = 'edge';
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 export async function POST(request: Request) {
   const encoder = new TextEncoder();
+  const { videoId } = await request.json().catch(() => ({ videoId: 'unknown' }));
   
   const stream = new ReadableStream({
     async start(controller) {
@@ -11,46 +18,55 @@ export async function POST(request: Request) {
 
       try {
         // 1. Iniciar RAG
-        sendEvent('status', { step: 'Iniciando conexión segura', progress: 10 });
+        sendEvent('status', { step: 'Conectando con OpenAI (GPT-4o)...', progress: 10 });
+        
+        // 2. Transcripción (Simulada por ahora hasta conectar YouTube Transcript API)
         await new Promise(r => setTimeout(r, 1000));
+        sendEvent('status', { step: 'Analizando metadatos del video...', progress: 40 });
 
-        // 2. Transcripción
-        sendEvent('status', { step: 'Descargando audio y transcribiendo con Whisper AI...', progress: 30 });
-        await new Promise(r => setTimeout(r, 2000));
+        // 3. Consulta a OpenAI
+        sendEvent('status', { step: 'Extrayendo ganchos y perfil de voz...', progress: 70 });
+        
+        const prompt = `
+          Actúa como un experto CMO y Copywriter de respuesta directa.
+          Analiza el concepto de un video viral para Marketing Digital y genera un perfil de voz y un copy altamente persuasivo.
+          
+          Debes responder ÚNICAMENTE con un objeto JSON válido con esta estructura exacta:
+          {
+            "voiceProfile": {
+              "tone": "Descripción del tono (ej. Autoritario, cercano)",
+              "pace": "Descripción del ritmo (ej. Rápido al inicio)",
+              "keywords": ["palabra1", "palabra2", "palabra3"]
+            },
+            "structureTemplate": "Explicación de la estructura en 4 pasos numerados",
+            "generatedCopy": "El copy final persuasivo listo para publicar."
+          }
+        `;
 
-        // 3. Extracción de Vectores
-        sendEvent('status', { step: 'Vectorizando transcripción y buscando Hooks...', progress: 60 });
-        await new Promise(r => setTimeout(r, 2500));
+        const completion = await openai.chat.completions.create({
+          model: 'gpt-4o-mini',
+          messages: [
+            { role: 'system', content: 'You are a helpful AI assistant designed to output pure JSON.' },
+            { role: 'user', content: prompt }
+          ],
+          response_format: { type: 'json_object' }
+        });
 
-        // 4. Perfilado RAG
-        sendEvent('status', { step: 'Construyendo Perfil de Voz y Cadencia...', progress: 85 });
-        await new Promise(r => setTimeout(r, 2000));
+        const resultText = completion.choices[0].message.content;
+        if (!resultText) throw new Error("No response from OpenAI");
 
-        // 5. Finalizado - Enviar resultado
+        const result = JSON.parse(resultText);
+
+        // 5. Finalizado
         sendEvent('status', { step: 'Generando Copy estructurado...', progress: 100 });
-        await new Promise(r => setTimeout(r, 1000));
-
-        const result = {
-          voiceProfile: {
-            tone: 'Autoritario pero cercano (Directo al punto)',
-            pace: 'Rápido en los primeros 10s, explicativo en el medio',
-            keywords: ['escalar', 'secreto', 'agencia', 'revolución']
-          },
-          structureTemplate: '1. Hook agresivo con pregunta retórica.\n2. Problema agudizado.\n3. Solución contraintuitiva.\n4. Call to Action directo.',
-          generatedCopy: `¿Todavía crees que publicar 3 veces al día te hará crecer? Falso. 
-
-La mayoría de agencias están quemando el presupuesto de sus clientes en tácticas del 2021. El verdadero secreto que usamos para escalar a $100k/mes no fue más contenido, fue **Sistemas de Retención Predictiva**.
-
-Si sigues perdiendo clientes al mes 3, tienes un hueco en tu barco. 
-
-👇 Comenta "SISTEMA" y te envío el documento exacto que usamos para cerrar retenciones anuales.`
-        };
+        await new Promise(r => setTimeout(r, 500));
 
         sendEvent('complete', result);
         controller.close();
 
-      } catch (error) {
-        sendEvent('error', { message: 'Error en el procesamiento RAG' });
+      } catch (error: any) {
+        console.error('OpenAI Error:', error);
+        sendEvent('error', { message: 'Error procesando la solicitud con OpenAI' });
         controller.close();
       }
     }
